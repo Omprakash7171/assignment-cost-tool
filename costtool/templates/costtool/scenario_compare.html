@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load reference_tags %}
+{% block title %}Compare scenarios · Assignment Cost Tool{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Compare scenarios</h1>
+  <p class="lede">Enter a baseline and an alternative assignment and see the cost
+     difference side by side. Both scenarios are worked out by the same calculation
+     engine as the Cost Estimate tab (spec X02).</p>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    <strong>Calculation error.</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% if base_form.non_field_errors or alt_form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+      {% for e in base_form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
+      {% for e in alt_form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="compare-forms">
+      <div class="compare-col">
+        <h2>Baseline</h2>
+        <fieldset>
+          <legend>Assignment</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=base_form.home_country %}
+            {% include "includes/form_field.html" with field=base_form.home_city %}
+            {% include "includes/form_field.html" with field=base_form.host_country %}
+            {% include "includes/form_field.html" with field=base_form.host_city %}
+            {% include "includes/form_field.html" with field=base_form.start_date %}
+            {% include "includes/form_field.html" with field=base_form.end_date %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Employee</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=base_form.nationality %}
+            {% include "includes/form_field.html" with field=base_form.marital_status %}
+            {% include "includes/form_field.html" with field=base_form.children %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Home pay</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=base_form.base_salary_home %}
+            {% include "includes/form_field.html" with field=base_form.bonus_home %}
+            {% include "includes/form_field.html" with field=base_form.fx_gbp_to_home %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Assignment benefits</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=base_form.housing_gbp_month %}
+            {% include "includes/form_field.html" with field=base_form.relocation_home %}
+            {% include "includes/form_field.html" with field=base_form.moving_gbp %}
+            {% include "includes/form_field.html" with field=base_form.temp_accom_gbp %}
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="compare-col">
+        <h2>Alternative</h2>
+        <fieldset>
+          <legend>Assignment</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=alt_form.home_country %}
+            {% include "includes/form_field.html" with field=alt_form.home_city %}
+            {% include "includes/form_field.html" with field=alt_form.host_country %}
+            {% include "includes/form_field.html" with field=alt_form.host_city %}
+            {% include "includes/form_field.html" with field=alt_form.start_date %}
+            {% include "includes/form_field.html" with field=alt_form.end_date %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Employee</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=alt_form.nationality %}
+            {% include "includes/form_field.html" with field=alt_form.marital_status %}
+            {% include "includes/form_field.html" with field=alt_form.children %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Home pay</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=alt_form.base_salary_home %}
+            {% include "includes/form_field.html" with field=alt_form.bonus_home %}
+            {% include "includes/form_field.html" with field=alt_form.fx_gbp_to_home %}
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Assignment benefits</legend>
+          <div class="grid">
+            {% include "includes/form_field.html" with field=alt_form.housing_gbp_month %}
+            {% include "includes/form_field.html" with field=alt_form.relocation_home %}
+            {% include "includes/form_field.html" with field=alt_form.moving_gbp %}
+            {% include "includes/form_field.html" with field=alt_form.temp_accom_gbp %}
+          </div>
+        </fieldset>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Compare scenarios</button>
+    </div>
+  </form>
+</section>
+
+{% if comparison %}
+<section class="panel" aria-label="Scenario comparison">
+  <h2>Comparison</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th scope="col">Metric</th>
+        <th scope="col" class="num">Baseline</th>
+        <th scope="col" class="num">Alternative</th>
+        <th scope="col" class="num">Difference</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in comparison.rows %}
+      <tr>
+        <td>{{ r.label }}</td>
+        <td class="num">{% if r.money %}{{ r.base|pounds }}{% else %}{{ r.base|floatformat:2 }}&times;{% endif %}</td>
+        <td class="num">{% if r.money %}{{ r.alt|pounds }}{% else %}{{ r.alt|floatformat:2 }}&times;{% endif %}</td>
+        <td class="num {% if r.delta > 0 %}delta-up{% elif r.delta < 0 %}delta-down{% endif %}">
+          {% if r.money %}{{ r.delta|pounds }}{% else %}{{ r.delta|floatformat:2 }}&times;{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="help">
+    {% if comparison.changed %}
+    Fields that differ: {{ comparison.changed|join:", " }}.
+    {% else %}
+    The two scenarios are identical, so there is no difference.
+    {% endif %}
+  </p>
+</section>
+{% endif %}
+{% endblock %}

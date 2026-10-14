@@ -1,0 +1,45 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Assignment Cost Tool{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">£</span>
+        <div>
+          <p class="brand-name">Assignment Cost Tool</p>
+          <p class="brand-tagline">International assignment cost &amp; immigration estimate</p>
+        </div>
+      </div>
+      <nav class="tabs" aria-label="Primary">
+        <a href="{% url 'costtool:cost_estimate' %}"
+           class="tab-link {% if tab == 'cost' %}is-active{% endif %}"
+           {% if tab == 'cost' %}aria-current="page"{% endif %}>Cost Estimate</a>
+        <a href="{% url 'costtool:scenario_compare' %}"
+           class="tab-link {% if tab == 'compare' %}is-active{% endif %}"
+           {% if tab == 'compare' %}aria-current="page"{% endif %}>Compare</a>
+        <a href="{% url 'reference:immigration' %}"
+           class="tab-link {% if tab == 'immigration' %}is-active{% endif %}"
+           {% if tab == 'immigration' %}aria-current="page"{% endif %}>Immigration</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Demonstration tool. Figures are estimates produced from stated assumptions and
+         must not be treated as tax or immigration advice.</p>
+    </div>
+  </footer>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

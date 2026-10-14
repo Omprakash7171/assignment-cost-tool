@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Cost Estimate · Assignment Cost Tool{% endblock %}
+{% block content %}
+{% include "costtool/_form.html" %}
+{% if result %}{% include "costtool/_results.html" %}{% endif %}
+{% endblock %}

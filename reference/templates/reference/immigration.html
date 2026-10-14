@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load reference_tags %}
+{% block title %}Immigration · Assignment Cost Tool{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Immigration</h1>
+  <p class="lede">United Kingdom immigration requirements for a Swiss national
+     moving from Zurich to London for a two-year assignment. Requirements are
+     marked <strong>mandatory</strong> (legal obligations), <strong>recommended</strong>
+     or <strong>estimate</strong>, and every statement links to an official
+     source.</p>
+  <p class="note">This is researched guidance, not legal advice. Confirm the
+     route with a qualified immigration adviser before acting.</p>
+</section>
+
+<section class="panel" aria-labelledby="routes-heading">
+  <h2 id="routes-heading">Candidate routes</h2>
+  <div class="route-grid">
+    {% for r in routes %}
+    <article class="route-card{% if r.is_primary %} route-primary{% endif %}">
+      <h3>
+        {{ r.name }}
+        {% if r.is_primary %}<span class="tag tag-primary">Likely route</span>{% endif %}
+      </h3>
+      <p>{{ r.summary }}</p>
+      <dl class="route-dl">
+        <dt>Who it is for</dt><dd>{{ r.for_whom }}</dd>
+        <dt>Minimum salary</dt><dd>{{ r.min_salary }}</dd>
+        <dt>Duration</dt><dd>{{ r.duration }}</dd>
+        <dt>Settlement</dt><dd>{{ r.settlement }}</dd>
+      </dl>
+      <ul class="route-reqs">
+        {% for req in r.key_requirements %}<li>{{ req }}</li>{% endfor %}
+      </ul>
+      <p class="src-line">Sources: <sup>[{{ r.source_ids|cite_numbers:source_numbers }}]</sup></p>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel" aria-labelledby="req-heading">
+  <h2 id="req-heading">Requirements</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th scope="col">Requirement</th>
+        <th scope="col">Responsible</th>
+        <th scope="col">Status</th>
+        <th scope="col" class="src">Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for req in requirements %}
+      <tr>
+        <td>
+          {{ req.title }}
+          <span class="deriv">{{ req.detail }}</span>
+        </td>
+        <td>{{ req.actor|capfirst }}</td>
+        <td><span class="tag tag-{{ req.classification }}">{{ classification_labels|dict_get:req.classification }}</span></td>
+        <td class="src"><sup>[{{ req.source_ids|cite_numbers:source_numbers }}]</sup></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="callout">
+    <strong>Passport:</strong> {{ passport_rule }}
+    <sup>[{{ passport_source_ids|cite_numbers:source_numbers }}]</sup>
+  </p>
+</section>
+
+<section class="panel" aria-labelledby="cost-heading">
+  <h2 id="cost-heading">Costs</h2>
+  <table class="data">
+    <thead>
+      <tr>
+        <th scope="col">Item</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Payer</th>
+        <th scope="col" class="src">Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in costs %}
+      <tr>
+        <td>
+          {{ c.label }}
+          <span class="deriv">{{ c.basis }}</span>
+        </td>
+        <td>{{ c.amount }}</td>
+        <td>{{ c.payer|capfirst }}</td>
+        <td class="src"><sup>[{{ c.source_ids|cite_numbers:source_numbers }}]</sup></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section class="panel" aria-labelledby="steps-heading">
+  <h2 id="steps-heading">Application steps</h2>
+  <ol class="steps">
+    {% for s in steps %}
+    <li>
+      <h3>{{ s.title }}</h3>
+      <p class="step-meta">{{ s.actor|capfirst }} &middot; {{ s.timing }}
+         <sup>[{{ s.source_ids|cite_numbers:source_numbers }}]</sup></p>
+      <p>{{ s.description }}</p>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+
+<section class="panel" aria-labelledby="checklist-heading">
+  <h2 id="checklist-heading">Readiness checklist</h2>
+  <ul class="checklist">
+    {% for item in checklist %}
+    <li>
+      <span class="actor-badge actor-{{ item.actor }}">{{ item.actor|capfirst }}</span>
+      {{ item.task }}
+      <sup>[{{ item.source_ids|cite_numbers:source_numbers }}]</sup>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="panel">
+  <h2>Sources</h2>
+  <ol class="sources">
+    {% for s in source_records %}
+    <li id="source-{{ forloop.counter }}">
+      <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+      <span class="src-meta">{{ s.publisher }} &middot; {{ s.effective }} &middot; checked {{ s.last_checked }}</span>
+      <span class="deriv">{{ s.relevance }}</span>
+    </li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% load reference_tags %}
+<section class="panel" aria-labelledby="form-heading">
+  <h1 id="form-heading">Cost Estimate</h1>
+  <p class="lede">Estimate the employer's total cost of a Zurich &rarr; London assignment
+     for each UK tax year. The form is pre-filled with the supplied test case
+     (T01&ndash;T10); change any value and re-run.</p>
+
+  {% if error %}
+  <div class="alert alert-danger" role="alert">
+    <strong>Calculation error.</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger" role="alert">
+    {% for e in form.non_field_errors %}<p>{{ e }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" novalidate id="estimate-form">
+    {% csrf_token %}
+
+    <fieldset>
+      <legend>Assignment</legend>
+      <div class="grid">
+        {% include "includes/form_field.html" with field=form.home_country %}
+        {% include "includes/form_field.html" with field=form.home_city %}
+        {% include "includes/form_field.html" with field=form.host_country %}
+        {% include "includes/form_field.html" with field=form.host_city %}
+        {% include "includes/form_field.html" with field=form.start_date %}
+        {% include "includes/form_field.html" with field=form.end_date %}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Employee</legend>
+      <div class="grid">
+        {% include "includes/form_field.html" with field=form.nationality %}
+        {% include "includes/form_field.html" with field=form.marital_status %}
+        {% include "includes/form_field.html" with field=form.children %}
+      </div>
+      <div class="grid">
+        {% include "includes/form_field.html" with field=form.uk_tax_resident_year1 %}
+        {% include "includes/form_field.html" with field=form.uk_tax_resident_year2 %}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Home pay</legend>
+      <div class="grid">
+        {% include "includes/form_field.html" with field=form.base_salary_home %}
+        {% include "includes/form_field.html" with field=form.bonus_home %}
+        {% include "includes/form_field.html" with field=form.fx_gbp_to_home %}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Assignment benefits</legend>
+      <div class="grid">
+        {% include "includes/form_field.html" with field=form.housing_gbp_month %}
+        {% include "includes/form_field.html" with field=form.relocation_home %}
+        {% include "includes/form_field.html" with field=form.moving_gbp %}
+        {% include "includes/form_field.html" with field=form.temp_accom_gbp %}
+      </div>
+    </fieldset>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary"
+              formaction="{% url 'costtool:cost_estimate' %}">Calculate cost</button>
+      <button type="submit" class="btn btn-secondary"
+              formaction="{% url 'costtool:csv_export' %}">Download CSV</button>
+    </div>
+  </form>
+</section>

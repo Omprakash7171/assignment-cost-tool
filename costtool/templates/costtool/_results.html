@@ -1,0 +1,180 @@
+{% load reference_tags %}
+<section class="results" aria-label="Estimate results">
+
+  <div class="panel summary">
+    <h2>Whole assignment</h2>
+    <dl class="summary-grid">
+      <div>
+        <dt>Total home pay (both years)</dt>
+        <dd>{{ result.total_home_pay_gbp|pounds }}</dd>
+      </div>
+      <div>
+        <dt>Total employer cost</dt>
+        <dd class="big">{{ result.total_employer_cost_gbp|pounds }}</dd>
+      </div>
+      <div>
+        <dt>Cost as a multiple of home pay</dt>
+        <dd>{{ result.cost_multiple|floatformat:2 }}&times;</dd>
+      </div>
+    </dl>
+  </div>
+
+  {% for y in result.years %}
+  <div class="panel year">
+    <h2>Year {{ y.year }} &mdash; {{ y.year_label }}</h2>
+
+    <h3>Section A &mdash; Home pay</h3>
+    <table class="data">
+      <thead>
+        <tr><th scope="col">Item</th><th scope="col" class="num">GBP</th><th scope="col" class="src">Source</th></tr>
+      </thead>
+      <tbody>
+        {% for line in y.section_a %}
+        <tr class="{% if line.label == 'Net home pay' or line.label == 'Gross home pay' %}subtotal{% endif %}">
+          <td>
+            {{ line.label }}
+            {% if line.derivation %}<span class="deriv">{{ line.derivation }}</span>{% endif %}
+          </td>
+          <td class="num">{{ line.amount|pounds }}</td>
+          <td class="src">{% if line.source_ids %}<sup>[{{ line.source_ids|cite_numbers:source_numbers }}]</sup>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Section B &mdash; Assignment benefits</h3>
+    <table class="data">
+      <thead>
+        <tr>
+          <th scope="col">Benefit</th>
+          <th scope="col" class="num">Amount</th>
+          <th scope="col" class="num">GBP</th>
+          <th scope="col">UK treatment</th>
+          <th scope="col" class="src">Source</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in y.benefits %}
+        <tr>
+          <td>
+            {{ b.label }}
+            {% if b.note %}<span class="deriv">{{ b.note }}</span>{% endif %}
+          </td>
+          <td class="num">{% if b.currency == "CHF" %}{{ b.amount_native|chf }}{% else %}{{ b.amount_native|pounds }}{% endif %}</td>
+          <td class="num">{{ b.amount_gbp|pounds }}</td>
+          <td><span class="tag tag-{{ b.classification|lower }}">{{ b.classification|classification }}</span></td>
+          <td class="src">{% if b.source_ids %}<sup>[{{ b.source_ids|cite_numbers:source_numbers }}]</sup>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Section C &mdash; Host tax and employer charges</h3>
+    <table class="data">
+      <thead>
+        <tr><th scope="col">Item</th><th scope="col" class="num">GBP</th><th scope="col" class="src">Source</th></tr>
+      </thead>
+      <tbody>
+        {% for line in y.section_c %}
+        <tr class="{% if line.classification == 'MEMO' %}memo{% endif %}">
+          <td>
+            {{ line.label }}
+            {% if line.derivation %}<span class="deriv">{{ line.derivation }}</span>{% endif %}
+          </td>
+          <td class="num">{{ line.amount|pounds }}</td>
+          <td class="src">{% if line.source_ids %}<sup>[{{ line.source_ids|cite_numbers:source_numbers }}]</sup>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Section D &mdash; Deductions</h3>
+    <table class="data">
+      <thead>
+        <tr><th scope="col">Item</th><th scope="col" class="num">GBP</th><th scope="col" class="src">Source</th></tr>
+      </thead>
+      <tbody>
+        {% for line in y.section_d %}
+        <tr>
+          <td>
+            {{ line.label }}
+            {% if line.derivation %}<span class="deriv">{{ line.derivation }}</span>{% endif %}
+          </td>
+          <td class="num">{{ line.amount|pounds }}</td>
+          <td class="src">{% if line.source_ids %}<sup>[{{ line.source_ids|cite_numbers:source_numbers }}]</sup>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <p class="year-total">
+      Total employer cost, year {{ y.year }}:
+      <strong>{{ y.total_employer_cost_gbp|pounds }}</strong>
+    </p>
+
+    {% with hist=result.gross_up_history|dict_get:y.year swiss=result.swiss_detail|dict_get:y.year %}
+    <details class="audit">
+      <summary>Calculation working &mdash; year {{ y.year }}</summary>
+
+      {% if swiss %}
+      <h4>Hypothetical Swiss tax</h4>
+      <table class="data compact">
+        <tbody>
+          <tr><td>Employment income</td><td class="num">{{ swiss.employment_income_home|chf }}</td></tr>
+          <tr><td>Less AHV/IV/EO (5.3%)</td><td class="num">{{ swiss.ahv_iv_eo_home|chf }}</td></tr>
+          <tr><td>Less ALV (1.1%, capped)</td><td class="num">{{ swiss.alv_home|chf }}</td></tr>
+          <tr class="subtotal"><td>Taxable income</td><td class="num">{{ swiss.taxable_income_home|chf }}</td></tr>
+          <tr><td>Federal direct tax</td><td class="num">{{ swiss.federal_tax_home|chf }}</td></tr>
+          <tr><td>Zurich simple cantonal tax</td><td class="num">{{ swiss.simple_cantonal_tax_home|chf }}</td></tr>
+          <tr><td>Cantonal + communal ({{ swiss.combined_steuerfuss }})</td><td class="num">{{ swiss.cantonal_communal_tax_home|chf }}</td></tr>
+          <tr class="subtotal"><td>Total hypothetical Swiss tax</td><td class="num">{{ swiss.swiss_total_tax_home|chf }}</td></tr>
+        </tbody>
+      </table>
+      {% endif %}
+
+      {% if hist %}
+      <h4>Gross-up iteration (T = UKTax(I + T))</h4>
+      <p class="help">Converged in {{ hist.iterations }} iterations; tolerance {{ hist.tolerance|pounds }}.</p>
+      <table class="data compact">
+        <thead>
+          <tr><th scope="col">#</th><th scope="col" class="num">Gross (GBP)</th><th scope="col" class="num">Tax (GBP)</th><th scope="col" class="num">|change|</th></tr>
+        </thead>
+        <tbody>
+          {% for rec in hist.history %}
+          <tr>
+            <td>{{ rec.iteration }}</td>
+            <td class="num">{{ rec.gross|pounds }}</td>
+            <td class="num">{{ rec.tax|pounds }}</td>
+            <td class="num">{{ rec.error|pounds }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </details>
+    {% endwith %}
+  </div>
+  {% endfor %}
+
+  <div class="panel">
+    <h2>Assumptions</h2>
+    <ul class="assumptions">
+      {% for a in result.assumptions %}<li>{{ a }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  {% if source_records %}
+  <div class="panel">
+    <h2>Sources</h2>
+    <ol class="sources">
+      {% for s in source_records %}
+      <li id="source-{{ forloop.counter }}">
+        <a href="{{ s.url }}" target="_blank" rel="noopener noreferrer">{{ s.title }}</a>
+        <span class="src-meta">{{ s.publisher }} &middot; effective {{ s.effective }} &middot; checked {{ s.last_checked }}</span>
+        <span class="deriv">{{ s.relevance }}</span>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
+</section>
