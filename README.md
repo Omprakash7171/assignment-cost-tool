@@ -74,6 +74,15 @@ The result is the total employer cost and the "cost as a multiple of home pay".
 - Plain HTML templates + hand-written CSS/JS in `static/`
 - `decimal.Decimal` throughout the calculation engine for deterministic money maths
 
+## Running Locally
+
+1. Clone the repository
+2. Create and activate a virtual environment: `python -m venv .venv && .\.venv\Scripts\Activate.ps1`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Apply migrations: `python manage.py migrate`
+5. Run the development server: `python manage.py runserver`
+6. Run tests: `python manage.py test`
+
 ## Project structure
 
 ```
