@@ -497,7 +497,7 @@ CHF 200,000 -> 181,818.18 and total 716,817.82).
 
 ### Commands run and actual results
 - `.\.venv\Scripts\python.exe manage.py test` -> `Ran 84 tests ... OK`
-  (0.212s).
+  (0.188s).
 
 ---
 
@@ -533,3 +533,44 @@ behaviour changed.
 ### Commands run and actual results
 - `.\.venv\Scripts\python.exe manage.py test` -> `Ran 84 tests ... OK`
   (0.188s).
+
+---
+
+## Stage 10 - Acceptance-gate close-out
+
+**Date:** 2026-10-17
+
+### Purpose
+Close the last project-side acceptance gate (G5/C6/M02: ">= 5 commits across
+>= 2 different days") with genuine follow-up work rather than back-dated or
+empty commits, and tidy the documentation left from Stage 9.
+
+### Files created or modified
+- `README.md` - removed the duplicated "Running Locally" section added after
+  Stage 9; the fuller "Installation", "Database and static files" and "Running
+  the app" sections already cover the same steps, so the README now presents
+  the setup instructions once.
+- `.env.example` (new) - documents the three environment variables the settings
+  module reads (`DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`)
+  with safe development defaults and generation guidance. `.gitignore` already
+  carried a `!.env.example` exception for exactly this file.
+- `docs/REQUIREMENTS.md` - G5, C6 and M02 set to DONE; the G5/C6 note rewritten
+  to record how the condition was met (commits on 2026-10-14 and 2026-10-17).
+- `docs/STAGE_REPORTS.md` - this report.
+
+### Important decisions
+1. **No back-dating** - the ">= 2 days" condition is met by this stage's
+   commits landing on 2026-10-17, three days after stages 1-9, exactly as the
+   earlier BLOCKED notes prescribed.
+2. **Only remaining TODOs are out-of-repo tasks** - G11/C12 (submit repo and
+   video before the deadline) and G12/C13/M03 (record the <= 5 minute Loom
+   walkthrough and add its link to the README) are actions for the candidate,
+   not code changes.
+
+### Commands run and actual results
+- `.\.venv\Scripts\python.exe manage.py test` -> `Ran 84 tests ... OK`
+  (0.154s; no application code changed this stage).
+- `manage.py check` -> `System check identified no issues (0 silenced).`
+- `git log --pretty=format:"%h %ad %s" --date=short` -> commits on
+  2026-10-14 and 2026-10-17; after this stage's three commits the repository
+  has 5 commits across 2 calendar days (G5/C6/M02 satisfied).

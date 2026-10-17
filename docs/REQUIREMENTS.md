@@ -11,7 +11,7 @@ Every mandatory item is tracked here. Status values: `TODO` / `DONE` / `BLOCKED`
 | G2 | Immigration tab covers work permission, business visits and passports | DONE |
 | G3 | Every displayed tax rule and immigration requirement has an official source link | DONE |
 | G4 | No secrets appear in files or Git history | DONE |
-| G5 | Repository is original (not a fork), >= 5 commits across >= 2 different days | BLOCKED |
+| G5 | Repository is original (not a fork), >= 5 commits across >= 2 different days | DONE |
 | G6 | README documents AI usage | DONE |
 | G7 | Exact supplied test case accepted; produces two annual cost tables with no source-code edits | DONE |
 | G8 | Backend uses Python and Django | DONE |
@@ -21,10 +21,10 @@ Every mandatory item is tracked here. Status values: `TODO` / `DONE` / `BLOCKED`
 | G12 | Loom walkthrough <= 5 minutes | TODO |
 | G13 | >= 1 test-case figure/requirement agrees with its cited official source | DONE |
 
-> **G5/C6 note:** there are 5+ meaningful commits but all are currently dated the
-> same day. The ">= 2 different days" condition requires at least one commit on a
-> later calendar day; commits must not be back-dated, so this is completed by
-> committing follow-up work on a subsequent day.
+> **G5/C6 note:** satisfied. The repository has commits dated 2026-10-14
+> (stages 1-9) and 2026-10-17 (documentation and repository-hygiene follow-ups),
+> meeting the "> = 5 commits across >= 2 different days" condition without any
+> back-dating.
 
 ## 2. Assessment checks 1-14
 
@@ -35,7 +35,7 @@ Every mandatory item is tracked here. Status values: `TODO` / `DONE` / `BLOCKED`
 | C3 | Official source link on every tax rule and immigration requirement | DONE |
 | C4 | No secrets in files or history | DONE |
 | C5 | Original repo, not a fork | DONE |
-| C6 | >= 5 commits across >= 2 days | BLOCKED |
+| C6 | >= 5 commits across >= 2 days | DONE |
 | C7 | README documents AI usage | DONE |
 | C8 | Supplied test case produces two annual cost tables | DONE |
 | C9 | Python + Django backend | DONE |
@@ -129,7 +129,7 @@ Every mandatory item is tracked here. Status values: `TODO` / `DONE` / `BLOCKED`
 
 ### 3.7 README / GitHub / demo
 - [x] M01 README: overview, features, stack, prerequisites, install, venv, dependencies, migration, run commands, how to obtain an estimate, test commands, methodology, sources, known limitations, AI usage, Loom link (only real links)
-- [ ] M02 >= 5 meaningful commits across >= 2 days from candidate account, original repo
+- [x] M02 >= 5 meaningful commits across >= 2 days from candidate account, original repo
 - [ ] M03 Loom walkthrough <= 5 min covering tabs, test case, audit trail, gross-up code, sources/tests
 
 ### 3.8 Secondary enhancements (only after mandatory work)
