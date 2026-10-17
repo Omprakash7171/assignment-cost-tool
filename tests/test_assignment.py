@@ -119,5 +119,54 @@ class ValidationTests(unittest.TestCase):
             )
 
 
+class ValidationModuleTests(unittest.TestCase):
+    """Strengthened input gate in calculator/validation.py."""
+
+    def _run(self, **kwargs):
+        return run_assignment(AssignmentInputs(**kwargs))
+
+    def test_nan_fx_rejected(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError):
+            self._run(fx_gbp_to_home=Decimal("NaN"))
+
+    def test_infinite_fx_rejected(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError):
+            self._run(fx_gbp_to_home=Decimal("Infinity"))
+
+    def test_nan_salary_rejected(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError):
+            self._run(base_salary_home=Decimal("NaN"))
+
+    def test_negative_children_rejected(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError):
+            self._run(children=-1)
+
+    def test_float_children_rejected(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError):
+            self._run(children=1.5)
+
+    def test_validate_inputs_usable_standalone(self):
+        from calculator import validate_inputs
+
+        validate_inputs(AssignmentInputs())  # supplied case must pass
+
+    def test_error_messages_are_readable(self):
+        from calculator.exceptions import CalculatorValidationError
+
+        with self.assertRaises(CalculatorValidationError) as ctx:
+            self._run(fx_gbp_to_home=Decimal("0"))
+        self.assertIn("Exchange rate", str(ctx.exception))
+
+
 if __name__ == "__main__":
     unittest.main()

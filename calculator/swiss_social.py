@@ -12,6 +12,7 @@ Sources: reference/sources.py (AHV/IV and ALV entries).
 from dataclasses import dataclass
 from decimal import Decimal
 
+from .exceptions import CalculatorValidationError
 from .rounding import dec
 
 AHV_IV_EO_RATE = Decimal("0.053")
@@ -31,7 +32,9 @@ def compute_swiss_social(employment_income):
     """Employee AHV/IV/EO + ALV on ``employment_income`` (CHF, annual)."""
     income = dec(employment_income)
     if income < 0:
-        raise ValueError("employment income must not be negative")
+        raise CalculatorValidationError(
+            "employment income must not be negative"
+        )
 
     ahv = AHV_IV_EO_RATE * income
     alv_base = min(income, ALV_CEILING)

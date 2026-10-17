@@ -26,7 +26,6 @@ from .employer_charges import (
     class1a_nic,
     employer_class1_nic,
 )
-from .exceptions import CalculatorValidationError
 from .grossup import solve_gross_up
 from .models import (
     BIK,
@@ -40,6 +39,7 @@ from .rounding import dec
 from .swiss_social import compute_swiss_social
 from .swiss_tax import DEFAULT_DEDUCTION_POLICY, compute_swiss_tax
 from .uk_tax import compute_uk_tax
+from .validation import validate_inputs
 
 YEAR_LABELS = {1: "2026/27", 2: "2027/28"}
 
@@ -61,27 +61,6 @@ ASSUMPTIONS = (
     "The employer-provided flat is a living-accommodation benefit in kind; its "
     "cash equivalent is taken equal to the rent paid.",
 ) + EMPLOYER_CHARGE_ASSUMPTIONS
-
-
-def _validate(inputs):
-    if inputs.fx_gbp_to_home <= 0:
-        raise CalculatorValidationError("Exchange rate must be greater than zero.")
-    if inputs.end_date <= inputs.start_date:
-        raise CalculatorValidationError("End date must be after start date.")
-    for name, value in (
-        ("base salary", inputs.base_salary_home),
-        ("bonus", inputs.bonus_home),
-        ("housing", inputs.housing_gbp_month),
-        ("relocation allowance", inputs.relocation_home),
-        ("moving costs", inputs.moving_gbp),
-        ("temporary accommodation", inputs.temp_accom_gbp),
-    ):
-        if dec(value) < 0:
-            raise CalculatorValidationError(
-                "{0} must not be negative.".format(name)
-            )
-    if inputs.children < 0:
-        raise CalculatorValidationError("Number of children must not be negative.")
 
 
 def _run_year(inputs, year):
@@ -296,7 +275,7 @@ def _run_year(inputs, year):
 
 def run_assignment(inputs):
     """Run the full two-year assignment and return an :class:`AssignmentResult`."""
-    _validate(inputs)
+    validate_inputs(inputs)
 
     years = []
     history = {}

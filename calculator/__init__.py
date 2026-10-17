@@ -20,9 +20,11 @@ from .models import (
     YearBenefit,
     YearResult,
 )
+from .validation import validate_inputs
 
 __all__ = [
     "run_assignment",
+    "validate_inputs",
     "CalculatorError",
     "CalculatorValidationError",
     "NonConvergenceError",
