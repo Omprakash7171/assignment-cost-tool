@@ -258,7 +258,7 @@ result. No AI-generated content was committed without being run against the test
 ## Demo video
 
 A short (≤5 minute) walkthrough video is submitted with the repository and is linked
-here once available: _Loom link to be added on submission._
+here once available: https://www.loom.com/share/528105f3e4c74cf894e96b8717d5467a
 
 ## License / attribution
 
